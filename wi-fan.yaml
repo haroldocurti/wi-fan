@@ -1,0 +1,163 @@
+esphome:
+  name: wi-fan
+
+esp8266:
+  board: nodemcu
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: ""
+  services:
+    - service: "wi_fan_controller"
+      variables:
+        speed: int
+      then:
+        - if:
+            condition:
+              - lambda: |-
+                  if (speed == 0) {
+                    return true;
+                    } else {
+                      return false;
+                    }
+            then:
+              - output.turn_off: speed01
+              - output.turn_off: speed02
+              - output.turn_off: speed03
+
+        - if:
+            condition:
+              - lambda: |-
+                  if (speed == 1) {
+                    return true;
+                    } else {
+                      return false;
+                    }
+            then:
+              - output.turn_off: speed02
+              - output.turn_off: speed03
+              - delay: 500ms
+              - output.turn_on: speed01
+        - if:
+            condition:
+              - lambda: |-
+                  if (speed == 2) {
+                    return true;
+                    } else {
+                      return false;
+                    }
+            then:
+              - output.turn_off: speed01
+              - output.turn_off: speed03
+              - delay: 500ms
+              - output.turn_on: speed02
+        - if:
+            condition:
+              - lambda: |-
+                  if (speed == 3) {
+                    return true;
+                    } else {
+                      return false;
+                    }
+            then:
+              - output.turn_off: speed01
+              - output.turn_off: speed02
+              - delay: 500ms
+              - output.turn_on: speed03
+
+ota:
+  password: ""
+web_server:
+  port: 80
+wifi:
+  ssid: #Use a sua
+  password: #Use a sua
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Wi-Fan Fallback Hotspot"
+    password: "eGsZYncIsm55"
+
+captive_portal:
+output:
+  - platform: gpio
+    id: "speed01"
+    pin: D5
+    inverted: true
+  - platform: gpio
+    id: "speed02"
+    pin: D6
+    inverted: true
+  - platform: gpio
+    id: "speed03"
+    pin: D7
+    inverted: true
+
+sensor:
+  - platform: rotary_encoder
+    name: "Fan Encoder"
+    pin_a: D1
+    pin_b: D2
+    min_value: 0
+    max_value: 3
+    publish_initial_value: true
+    restore_mode: ALWAYS_ZERO
+    force_update: true
+    entity_category: config
+    on_value:
+      then:
+        - if:
+            condition:
+              - lambda: |-
+                  if (x == 0) {
+                    return true;
+                    } else {
+                      return false;
+                    }
+            then:
+              - output.turn_off: speed01
+              - output.turn_off: speed02
+              - output.turn_off: speed03
+
+        - if:
+            condition:
+              - lambda: |-
+                  if (x == 1) {
+                    return true;
+                    } else {
+                      return false;
+                    }
+            then:
+              - output.turn_off: speed02
+              - output.turn_off: speed03
+              - delay: 500ms
+              - output.turn_on: speed01
+        - if:
+            condition:
+              - lambda: |-
+                  if (x == 2) {
+                    return true;
+                    } else {
+                      return false;
+                    }
+            then:
+              - output.turn_off: speed01
+              - output.turn_off: speed03
+              - delay: 500ms
+              - output.turn_on: speed02
+        - if:
+            condition:
+              - lambda: |-
+                  if (x == 3) {
+                    return true;
+                    } else {
+                      return false;
+                    }
+            then:
+              - output.turn_off: speed01
+              - output.turn_off: speed02
+              - delay: 500ms
+              - output.turn_on: speed03
